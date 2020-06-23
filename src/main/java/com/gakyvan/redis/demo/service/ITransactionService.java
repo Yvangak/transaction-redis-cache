@@ -1,8 +1,8 @@
-package com.gakyvan.redis.demo.repository;
+package com.gakyvan.redis.demo.service;
 
 import com.gakyvan.redis.demo.domain.Transaction;
 
-public interface ITransactionRepository {
+public interface ITransactionService {
 
     void save(Transaction transaction);
 
