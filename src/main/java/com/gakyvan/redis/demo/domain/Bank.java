@@ -1,9 +1,13 @@
 package com.gakyvan.redis.demo.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class Bank {
+@Builder
+public class Bank implements Serializable {
     private String bankCode;
     private String bankName;
 }
