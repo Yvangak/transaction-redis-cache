@@ -6,6 +6,7 @@ import com.gakyvan.redis.demo.domain.Transaction;
 import com.gakyvan.redis.demo.exception.TransactionNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,28 +23,26 @@ public class TransactionService {
     private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     private List<Transaction> transactions;
 
-    @CachePut(value = "transaction", key = "#transaction.transactionCode")
-    public void updateTransaction(Transaction transaction) {
-        logger.info("Posted transaction with code: {}", transaction.getTransactionCode());
+    @CachePut(value = "transaction", key = "#code")
+    public Transaction updateTransaction(String code, Transaction transaction) {
+        logger.info("[Cache-Put] Posted transaction with code: {}", code);
+        transaction.setTransactionCode(code);
+
         transactions = transactions.stream()
                 .filter(trans -> !trans.getTransactionCode().equals(transaction.getTransactionCode()))
                 .collect(Collectors.toList());
 
         transactions.add(transaction);
-    }
 
-    public void removeTransaction(String code) {
-        transactions = transactions.stream()
-                .filter(transaction -> !transaction.getTransactionCode().equals(code))
-                .collect(Collectors.toList());
+        return transaction;
     }
 
     @Cacheable(value = "transaction", key = "#code")
     public Transaction findTransaction(String code) throws TransactionNotFoundException {
-        logger.info("Get transaction for id: {}", code);
+        logger.info("[Cache-able :)] Get transaction for id: {}", code);
         try {
-            logger.debug("Sleeping 1 second ....");
-            TimeUnit.SECONDS.sleep(1);
+            logger.info("Sleeping 1 second ....");
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -51,6 +50,14 @@ public class TransactionService {
                 .filter(transaction -> transaction.getTransactionCode().equals(code))
                 .findFirst()
                 .orElseThrow(() -> new TransactionNotFoundException("Cannot find Transaction with id:" + code));
+    }
+
+    @CacheEvict(value = "transaction", key = "#code")
+    public void removeTransaction(String code) {
+        logger.info("[Cache-Evict] removeTransaction transaction deleted code: {}", code);
+        transactions = transactions.stream()
+                .filter(transaction -> !transaction.getTransactionCode().equals(code))
+                .collect(Collectors.toList());
     }
 
     @PostConstruct

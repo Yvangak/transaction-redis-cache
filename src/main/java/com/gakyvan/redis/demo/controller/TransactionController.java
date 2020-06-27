@@ -22,14 +22,20 @@ public class TransactionController {
 
     @PostMapping("/{code}")
     public ResponseEntity<Transaction> saveTransaction(@PathVariable String code, @RequestBody Transaction transaction) {
-        transaction.setTransactionCode(code);
-        transactionService.updateTransaction(transaction);
+        Transaction updatedTransaction = transactionService.updateTransaction(code,transaction);
+        return new ResponseEntity<>(updatedTransaction, HttpStatus.OK);
+    }
+
+    @GetMapping("/{code}")
+    public ResponseEntity<Transaction> getTransactionByCode(@PathVariable String code)
+            throws TransactionNotFoundException {
+        Transaction transaction = transactionService.findTransaction(code);
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
-    @GetMapping("/{code}/transaction")
-    public ResponseEntity<Transaction> getTransactionByCode(@PathVariable String code) throws TransactionNotFoundException {
-        Transaction transaction = transactionService.findTransaction(code);
-        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    @DeleteMapping("/{code}")
+    public ResponseEntity<?> removeTransactionByCode(@PathVariable String code) {
+        transactionService.removeTransaction(code);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
