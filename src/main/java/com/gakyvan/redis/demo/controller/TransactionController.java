@@ -3,8 +3,6 @@ package com.gakyvan.redis.demo.controller;
 import com.gakyvan.redis.demo.domain.Transaction;
 import com.gakyvan.redis.demo.exception.TransactionNotFoundException;
 import com.gakyvan.redis.demo.service.TransactionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +32,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{code}")
-    public ResponseEntity<?> removeTransactionByCode(@PathVariable String code) {
+    public ResponseEntity<HttpStatus> removeTransactionByCode(@PathVariable String code) {
         transactionService.removeTransaction(code);
         return new ResponseEntity<>(HttpStatus.OK);
     }
